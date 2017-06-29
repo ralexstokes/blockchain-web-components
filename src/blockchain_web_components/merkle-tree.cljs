@@ -1,4 +1,4 @@
-(ns what-is-blockchain.merkle-tree
+(ns blockchain-web-components.merkle-tree
   (:require
    [cljsjs.web3]
    [cljs-web3.core :as web3]

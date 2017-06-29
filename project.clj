@@ -1,5 +1,5 @@
-(defproject what-is-blockchain "0.1.0-SNAPSHOT"
-  :description "code to accompany the blog post"
+(defproject blockchain-web-components "0.1.0-SNAPSHOT"
+  :description "collection of components to explore blockchain in the browser"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -25,16 +25,16 @@
                 ;; the presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "what-is-blockchain.core/on-js-reload"
+                :figwheel {:on-jsload "blockchain-web-components.core/on-js-reload"
                            ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and complied your application.
                            ;; Comment this out once it no longer serves you.
                            :open-urls ["http://localhost:3449/index.html"]}
 
-                :compiler {:main what-is-blockchain.core
+                :compiler {:main blockchain-web-components.core
                            :asset-path "js/compiled/out"
-                           :output-to "resources/public/js/compiled/what_is_blockchain.js"
+                           :output-to "resources/public/js/compiled/blockchain_web_components.js"
                            :output-dir "resources/public/js/compiled/out"
                            :source-map-timestamp true
                            ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
@@ -45,8 +45,8 @@
                ;; lein cljsbuild once min
                {:id "min"
                 :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/what_is_blockchain.js"
-                           :main what-is-blockchain.core
+                :compiler {:output-to "resources/public/js/compiled/blockchain_web_components.js"
+                           :main blockchain-web-components.core
                            :optimizations :advanced
                            :pretty-print false}}]}
 

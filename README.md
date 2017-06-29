@@ -1,4 +1,4 @@
-# what-is-blockchain
+# blockchain-web-components
 
 Interactive components for exploring parts of the blockchain data structure.
 

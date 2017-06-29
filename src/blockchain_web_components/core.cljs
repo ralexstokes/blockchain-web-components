@@ -1,8 +1,8 @@
-(ns what-is-blockchain.core
+(ns blockchain-web-components.core
   (:require [reagent.core :as reagent]
             [clojure.string :as str]
             [clojure.pprint :as pp]
-            [what-is-blockchain.merkle-tree :as m]))
+            [blockchain-web-components.merkle-tree :as m]))
 
 (enable-console-print!)
 
