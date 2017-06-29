@@ -5,14 +5,14 @@
    [clojure.walk :as w]
    [clojure.string :as str]))
 
-(defn rand-str [len]
+(defn- rand-str [len]
   "mainly for testing"
   (apply str (take len (repeatedly #(js/String.fromCharCode (+ (rand 26) 97))))))
-(defn input [n]
+(defn- input [n]
   "mainly for testing"
   (vec (take n (map #(js/String.fromCharCode (+ 97 %)) (range 0 n)))))
 
-(defn the-hash [s]
+(defn- the-hash [s]
   (web3/sha3 s))
 
 (defn- hash-children [c]

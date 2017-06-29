@@ -6,35 +6,35 @@
 
 (enable-console-print!)
 
-(defn state-from [input]
-  (if (str/blank? input)
-    {:tree nil :input input}
-    {:tree (m/tree-from (str/split input ""))
-     :input input}))
-
-(defn state-update [current input]
-    (state-from input))
-
 (defn input-from-state [state]
   (state :input))
 (defn tree-from-state [state]
   (state :tree))
 
-(defn input-with-fn [state f]
+(defn state-from [input]
+  (if (str/blank? input)
+    {:tree nil
+     :input input}
+    {:tree (m/tree-from (str/split input ""))
+     :input input}))
+
+(defn state-update [_ input]
+  (state-from input))
+
+(defn input-with-fn [state valuer on-changer]
     [:input {:type "text"
-             :value (input-from-state @state)
-             :on-change #(swap! state f (-> % .-target .-value))}])
+             :value (valuer @state)
+             :on-change #(swap! state on-changer (-> % .-target .-value))}])
 
 (defn merkle-tree-input [state]
-  [:div
-   [input-with-fn state state-update]])
+  [:div#blockchain-merkle-tree-input
+   [input-with-fn state input-from-state state-update]])
 
 (defn rand-str [len]
-  "mainly for testing"
   (apply str (take len (repeatedly #(js/String.fromCharCode (+ (rand 26) 97))))))
-
 (defn- keyify-node [node]
-  (with-meta [:p node] {:key (rand-str 7)}))
+  "React requests a unique key on list or repeated elements; helps performance"
+  (with-meta [:div node] {:key (rand-str 7)}))
 
 (defn- print-tree [tree]
   (map keyify-node (str/split (clojure.pprint/write tree :stream nil) "\n")))
@@ -46,7 +46,7 @@
 
 (defn merkle-tree-view [state]
   (let [tree (tree-from-state @state)]
-    [:div
+    [:div#blockchain-merkle-tree-view
      (display-tree tree)]))
 
 (defn merkle-tree-component [seed-state]
