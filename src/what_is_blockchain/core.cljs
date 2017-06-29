@@ -1,17 +1,22 @@
 (ns what-is-blockchain.core
   (:require [reagent.core :as reagent]
             [clojure.string :as str]
+            [clojure.pprint :as pp]
             [what-is-blockchain.merkle-tree :as m]))
 
 (enable-console-print!)
 
-(defn state-update [_ input]
-  {:tree (m/tree-from input)
-   :input input})
+(defn state-from [input]
+  (if (str/blank? input)
+    {:tree nil :input input}
+    {:tree (m/tree-from (str/split input ""))
+     :input input}))
+
+(defn state-update [current input]
+    (state-from input))
 
 (defn input-from-state [state]
   (state :input))
-
 (defn tree-from-state [state]
   (state :tree))
 
@@ -24,9 +29,19 @@
   [:div
    [input-with-fn state state-update]])
 
+(defn rand-str [len]
+  "mainly for testing"
+  (apply str (take len (repeatedly #(js/String.fromCharCode (+ (rand 26) 97))))))
+
+(defn- keyify-node [node]
+  (with-meta [:p node] {:key (rand-str 7)}))
+
+(defn- print-tree [tree]
+  (map keyify-node (str/split (clojure.pprint/write tree :stream nil) "\n")))
+
 (defn display-tree [tree]
   (if tree
-    (pr-str tree)
+    (print-tree tree)
     ""))
 
 (defn merkle-tree-view [state]
@@ -40,11 +55,7 @@
      [merkle-tree-input state]
      [merkle-tree-view state]]))
 
-(defn state-from [input]
-  {:tree (m/tree-from input)
-   :input input})
-
-(def empty-state (state-from ""))
+(def empty-state {:input ""})
 
 (defn ^:export main []
   (reagent/render-component [merkle-tree-component empty-state]
