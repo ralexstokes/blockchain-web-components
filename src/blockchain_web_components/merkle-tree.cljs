@@ -12,11 +12,11 @@
   "mainly for testing"
   (vec (take n (map #(js/String.fromCharCode (+ 97 %)) (range 0 n)))))
 
-(defn- the-hash [s]
+(defn- hasher [s]
   (web3/sha3 s))
 
 (defn- hash-children [c]
-  (the-hash
+  (hasher
    (str/join (mapcat #(% :value) c))))
 
 (defn- tree-partition [input k] (partition k k input))
