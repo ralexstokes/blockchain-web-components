@@ -42,12 +42,15 @@
   (let [tree (make-tree input branching-factor)]
     (w/postwalk hash-node tree)))
 
+(defn log [base n]
+  (/ (.log js/Math n) (.log js/Math base)))
+
 (defn- pad [input n empty]
   "append empty to input until it's length is a power of n"
   (let [i (count input)]
     (cond
       (= i 0) nil
-      (> (mod i n) 0) (pad (conj input empty) (dec n) empty)
+      (not (integer? (log n i))) (pad (conj input empty) n empty)
       :else input)))
 
 (def empty-input "")
