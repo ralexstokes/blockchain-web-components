@@ -21,8 +21,9 @@
   (if (str/blank? input)
     {:tree nil
      :input input}
-    {:tree (m/tree-from (str/split input ""))
-     :input input}))
+    (let [t (m/tree-from (str/split input ""))]
+      {:tree t
+       :input input})))
 
 (defn state-update [_ input]
   (state-from input))
@@ -46,9 +47,12 @@
   (let [t (js/d3.tree.)]
     (.size t (clj->js [width height]))))
 
+(defn- select-children [d]
+  (clj->js (remove nil? (vector (.-left d) (.-right d)))))
+
 (defn build-nodes [tree width height]
   (let [root (-> js/d3
-                 (.hierarchy (clj->js tree)))]
+                 (.hierarchy (clj->js tree) select-children))]
     ((treemap width height) root)))
 
 (defn link-position-data [d]
@@ -72,10 +76,10 @@
 
 (defn- node-text [d]
   ;; just show first few of hash
-  ;; (let [s (subs (.-value (.-data d)) 0 8)]
-  (let [s (.-value (.-data d))]
+  (let [s (subs (.-value (.-data d)) 0 8)]
+  ;; (let [s (.-value (.-data d))]
     (if (str/blank? s)
-      "\"\""
+      ""
       s)))
 
 (defn build-transform [margin x y]
@@ -116,7 +120,6 @@
       {:transform (build-transform margin #(.-left %) #(.-top %))}
       (build-links nodes)
       (build-nodes-text nodes)]]))
-
 (defn merkle-tree-view [state]
   [:div#blockchain-merkle-tree-view
    (if-let [tree (tree-from-state @state)]
@@ -132,8 +135,7 @@
 
 (defn ^:export main []
   (reagent/render-component [merkle-tree-component empty-state]
-                            (. js/document (getElementById "app")))
-  )
+                            (. js/document (getElementById "app"))))
 (main)
 
 (comment
