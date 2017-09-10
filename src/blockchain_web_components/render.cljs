@@ -8,14 +8,12 @@
   next-node-id)
 
 (def margin (js-obj "top" 40 "right" 90 "bottom" 50 "left" 90))
-;; {:width (.-innerWidth js/window)
-;;  :height (.-innerHeight js/window)}
 ;; (def svg-width (- 660 (.-left margin) (.-right margin)))
-(defn svg-width [] (* 0.6
+(defn svg-width [] (* 0.8
                   (.-innerWidth js/window)))
 ;; (def svg-height (- 500 (.-top margin) (.-bottom margin)))
-(defn svg-height [] (* 0.6
-                   (.-innerHeight js/window)))
+(defn svg-height [] (* 0.8
+                       (.-innerHeight js/window)))
 
 (defn- clustermap [width height]
   (let [t (js/d3.cluster.)]
@@ -43,22 +41,12 @@
 
 (defn horizontal-link [d]
   (str "M" (.-y d) "," (.-x d)
-       "C" (+ 100 (-> d
-                      .-parent
-                      .-y))
+       "C" (+ 100 (-> d .-parent .-y))
        "," (.-x d)
-       " " (+ 100 (-> d
-                      .-parent
-                      .-y))
-       "," (-> d
-               .-parent
-               .-x)
-       " " (-> d
-               .-parent
-               .-y)
-       "," (-> d
-               .-parent
-               .-x)))
+       " " (+ 100 (-> d .-parent .-y))
+       "," (-> d .-parent .-x)
+       " " (-> d .-parent .-y)
+       "," (-> d .-parent .-x)))
 
 (defn node-class [d]
   (str "node"
@@ -184,13 +172,22 @@
      (render-tree-horizontal tree (svg-width) (svg-height))))
   ([tree width height]
    (let [nodes (build-nodes tree clustermap width height)]
-     [:svg
-      {:width (+ width (.-left margin) (.-right margin))
-       :height (+ height (.-top margin) (.-bottom margin))}
-      [:g
-       {:transform (build-transform margin #(.-left %) #(.-top %))}
-       (build-links nodes horizontal-link)
-       (build-nodes-text nodes :horizontal)]])))
+     [:div.svg-container
+      [:svg
+       {:version "1.1"
+        :viewBox (str 0 " " 0 " " width " " height);;"0 0 900 400"
+        ;; :class "svg-content"
+        ;; :preserveAspectRatio "xMinYMin meet"
+        ;; :style "width: 100%; height: 10em;"
+        ;; :width "100%"
+        ;; :height "100%"
+        }
+       ;; {:width (+ width (.-left margin) (.-right margin))
+       ;; :height (+ height (.-top margin) (.-bottom margin))}
+       [:g
+        {:transform (build-transform margin #(.-left %) #(.-top %))}
+        (build-links nodes horizontal-link)
+        (build-nodes-text nodes :horizontal)]]])))
 
 (defn render-tree [{:keys [tree orientation]}]
   (({:horizontal render-tree-horizontal

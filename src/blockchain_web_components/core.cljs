@@ -12,17 +12,18 @@
            :value (@state :current-input)
            :on-change #(swap! state on-changer (-> % .-target .-value))}])
 
+(defn- update-state [state new-data]
+  (-> state
+      (assoc :data new-data)
+      (assoc :tree (m/tree-from new-data))))
+
 (defn- add-message [state]
   (let [data (state :data)
         msg (state :current-input)]
-
-    (m/tree-from data)
     (if (str/blank? msg)
       state
       (let [new-data (conj data msg)]
-        (-> state
-            (assoc :data new-data)
-            (assoc :tree (m/tree-from new-data)))))))
+        (update-state state new-data)))))
 
 (defn- update-input [state input]
   (assoc state :current-input input))
@@ -41,10 +42,12 @@
   (let [[head tail] (split-at i data)]
     (into (into [] head) (rest tail))))
 
+(defn- pp [obj]
+  (.log js/console (str  obj)))
+
 (defn- remove-msg [state i]
   (let [data (state :data)]
-    (assoc state :data
-           (remove-msg-from i data))))
+    (update-state state (remove-msg-from i data))))
 
 (defn- listify [i node state]
   [:li
@@ -59,7 +62,7 @@
 
 (defn- merkle-tree-view [state]
   [:div#blockchain-merkle-tree-view
-   (let [t(@state :tree)]
+   (let [t (@state :tree)]
      (r/render-tree
       {:tree t
        :orientation :horizontal}))])
@@ -73,12 +76,14 @@
 
 (defn- show [state]
   [:p
-   (str (dissoc @state :tree))])
+   (str   ;;@state
+    (dissoc @state :tree)
+    )])
 
 (def test-state
   (let [test-data ["send 1 btc to alex"
-                  "send 2 btc to danny"
-                  "send 3 btc to alex"
+                   "send 2 btc to danny"
+                   "send 3 btc to alex"
                    "send 4 btc to tycho"]]
     (-> empty-state
         (assoc :data test-data)
