@@ -11,10 +11,10 @@
 ;; {:width (.-innerWidth js/window)
 ;;  :height (.-innerHeight js/window)}
 ;; (def svg-width (- 660 (.-left margin) (.-right margin)))
-(defn svg-width [] (* 0.8
+(defn svg-width [] (* 0.6
                   (.-innerWidth js/window)))
 ;; (def svg-height (- 500 (.-top margin) (.-bottom margin)))
-(defn svg-height [] (* 1
+(defn svg-height [] (* 0.6
                    (.-innerHeight js/window)))
 
 (defn- clustermap [width height]
@@ -104,10 +104,11 @@
    {:class "link"
     :d (link-position node)
     :key (get-next-node-id)}])
+
 (defn build-links [nodes link-position]
   (map #(build-link % link-position) (.. nodes
-                      descendants
-                      (slice 1))))
+                                         descendants
+                                         (slice 1))))
 
 (defn- radius-for [orientation]
   ({:vertical 10
@@ -118,7 +119,7 @@
     :vertical "0.35em"
     :horizontal (if (.-children node)
                   "1.5em"
-                  "0")))
+                  "0.25em")))
 
 (defn- pos-prop-for [orientation]
   ({:vertical :y
