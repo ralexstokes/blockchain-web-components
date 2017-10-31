@@ -7,17 +7,18 @@
   (set! next-node-id (inc next-node-id))
   next-node-id)
 
-(def margin (js-obj "top" 40 "right" 90 "bottom" 50 "left" 90))
+(def margin (js-obj "top" 0 "right" 0 "bottom" 0 "left" 60))
 ;; (def svg-width (- 660 (.-left margin) (.-right margin)))
-(defn svg-width [] (* 0.8
-                  (.-innerWidth js/window)))
+(defn svg-width [] (* 0.5
+                      (.-innerWidth js/window)))
 ;; (def svg-height (- 500 (.-top margin) (.-bottom margin)))
-(defn svg-height [] (* 0.8
+(defn svg-height [] (* 0.5
                        (.-innerHeight js/window)))
 
 (defn- clustermap [width height]
   (let [t (js/d3.cluster.)]
-    (.size t (clj->js [height (- width 160)]))))
+    (-> t
+        (.size (clj->js [(* 1 height) (* 0.5 width)])))))
 
 (defn- treemap [width height]
   (let [t (js/d3.tree.)]
@@ -70,19 +71,24 @@
         data (map #(% d) (fnmap orientation))
         intercalations ["translate(" "," ")"]]
     (str/join ""
-      (interleave intercalations data))))
+              (interleave intercalations data))))
 
 (defn- node-text-y [d]
   (if (.-children d)
     -20
     20))
 
+(defn- display-leaf [s]
+  (if (> (count s) 30)
+    (str (subs s 0 30) "...")
+    s))
+
 (defn- node-text [d]
   "if d has children, it is a hash and only reveal an abbreviation"
   (let [s (.-value (.-data d))]
     (if (.-children d)
       (str (subs s 0 12) "...")
-      s)))
+      (display-leaf s))))
 
 (defn build-transform [margin x y]
   (str "translate(" (x margin) "," (y margin) ")"))
@@ -175,15 +181,8 @@
      [:div.svg-container
       [:svg
        {:version "1.1"
-        :viewBox (str 0 " " 0 " " width " " height);;"0 0 900 400"
-        ;; :class "svg-content"
-        ;; :preserveAspectRatio "xMinYMin meet"
-        ;; :style "width: 100%; height: 10em;"
-        ;; :width "100%"
-        ;; :height "100%"
+        :viewBox (str 0 " " 0 " " width " " height)
         }
-       ;; {:width (+ width (.-left margin) (.-right margin))
-       ;; :height (+ height (.-top margin) (.-bottom margin))}
        [:g
         {:transform (build-transform margin #(.-left %) #(.-top %))}
         (build-links nodes horizontal-link)

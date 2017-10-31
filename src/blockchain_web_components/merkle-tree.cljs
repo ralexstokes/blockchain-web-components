@@ -57,5 +57,3 @@
 
 (defn tree-from [coll]
   (hash-tree (build-tree coll)))
-
-(tree-from [])
