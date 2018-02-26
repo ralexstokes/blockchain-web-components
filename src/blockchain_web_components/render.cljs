@@ -7,13 +7,13 @@
   (set! next-node-id (inc next-node-id))
   next-node-id)
 
-(def margin (js-obj "top" 0 "right" 0 "bottom" 0 "left" 60))
-;; (def svg-width (- 660 (.-left margin) (.-right margin)))
-(defn svg-width [] (* 0.5
-                      (.-innerWidth js/window)))
-;; (def svg-height (- 500 (.-top margin) (.-bottom margin)))
-(defn svg-height [] (* 0.5
-                       (.-innerHeight js/window)))
+(def margin (js-obj "top" 10 "right" 10 "bottom" 10 "left" 60))
+(defn svg-width [] (- 660 (.-left margin) (.-right margin)))
+;; (defn svg-width [] (* 0.5
+;;                       (.-innerWidth js/window)))
+(defn svg-height [] (- 500 (.-top margin) (.-bottom margin)))
+;; (defn svg-height [] (* 0.5
+;;                        (.-innerHeight js/window)))
 
 (defn- clustermap [width height]
   (let [t (js/d3.cluster.)]
@@ -177,20 +177,27 @@
      [:div]
      (render-tree-horizontal tree (svg-width) (svg-height))))
   ([tree width height]
-   (let [nodes (build-nodes tree clustermap width height)]
-     [:div.svg-container
-      [:svg
+   (let [width (or width
+                   (svg-width))
+         height (or height
+                    (svg-height))
+         nodes (build-nodes tree clustermap width height)]
+     [:div;;.svg-container
+      [:svg;;.svg-content-responsive
        {:version "1.1"
+        :preserveAspectRatio "xMinYMin meet"
         :viewBox (str 0 " " 0 " " width " " height)
+        ;; "0 0 600 400"
+        ;; (str 0 " " 0 " " width " " height)
         }
        [:g
         {:transform (build-transform margin #(.-left %) #(.-top %))}
         (build-links nodes horizontal-link)
         (build-nodes-text nodes :horizontal)]]])))
 
-(defn render-tree [{:keys [tree orientation]}]
+(defn render-tree [{:keys [tree orientation width height]}]
   (({:horizontal render-tree-horizontal
-    :vertical    render-tree-vertical} orientation) tree))
+     :vertical    render-tree-vertical} orientation) tree width height))
 
 (comment
   (defn rand-str [len]

@@ -60,12 +60,14 @@
    [:ul
     (map-indexed #(listify %1 %2 state) (@state :data))]])
 
-(defn- merkle-tree-view [state]
+(defn- merkle-tree-view [state width height]
   [:div#blockchain-merkle-tree-view
    (let [t (@state :tree)]
      (r/render-tree
       {:tree t
-       :orientation :horizontal}))])
+       :orientation :horizontal
+       :width width
+       :height height}))])
 
 (def empty-state
   (let [data []]
@@ -102,6 +104,36 @@
   [:div#state
    [:p (str "Merkle root hash: " (root-hash @state))]])
 
+;; https://github.com/reagent-project/reagent-cookbook/blob/master/recipes/canvas-fills-div/README.md
+(def window-width (reagent/atom nil))
+
+(defn on-window-resize [evt]
+  (reset! window-width (.-innerWidth js/window)))
+
+(defn render-with-resize [state]
+  (let [dom-node (reagent/atom nil)]
+    (reagent/create-class
+     {:component-did-update
+      (fn [ this ]
+        [merkle-tree-view state
+         (if-let [node @dom-node]
+           (.-clientWidth node))
+         (if-let [node @dom-node]
+           (.-clientHeight node))])
+
+      :component-did-mount
+      (fn [ this ]
+        (reset! dom-node (reagent/dom-node this)))
+
+      :reagent-render
+      (fn [ ]
+        @window-width ;; Trigger re-render on window resizes
+        [merkle-tree-view state
+         (if-let [node @dom-node]
+           (.-clientWidth node))
+         (if-let [node @dom-node]
+           (.-clientHeight node))])})))
+
 (defn- merkle-tree-component [seed-state]
   (let [state (reagent/atom seed-state)]
     [:div
@@ -109,10 +141,11 @@
      [merkle-tree-input state]
      [merkle-tree-txn-list state]
      [merkle-tree-result state]
-     [merkle-tree-view state]]))
+     [render-with-resize state]]))
 
 (defn ^:export main []
   (reagent/render-component [merkle-tree-component empty-state]
-                            (. js/document (getElementById "app"))))
+                            (. js/document (getElementById "app")))
+  (.addEventListener js/window "resize" on-window-resize))
 
 (main)
